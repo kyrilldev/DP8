@@ -1,38 +1,39 @@
 # import modulen
+from enum import IntEnum
 from pathlib import Path
 import json
 import pprint
-from database_wrapper import Database
 import random
-from enum import Enum
+from database_wrapper import Database
 
 
-class bevoegdheid(Enum):
-    '''Helps simplify selecting tasks'''
-    STAGIAIRE = "Stagiaire",
-    JUNIOR = "Junior",
-    MEDIOR = "Medior",
-    SENIOR = "Senior"
+class Bevoegdheid(IntEnum):
+    STAGIAIR = 0
+    JUNIOR    = 1
+    MEDIOR    = 2
+    SENIOR    = 3
 
-# initialisatie
+MAP = {
+    "stagiair": Bevoegdheid.STAGIAIR,
+    "junior":    Bevoegdheid.JUNIOR,
+    "medior":    Bevoegdheid.MEDIOR,
+    "senior":    Bevoegdheid.SENIOR,
+}
+
+def to_level(v) -> Bevoegdheid:
+    """Converts IntEnum to String from MAP"""
+    if isinstance(v, Bevoegdheid):
+        return v
+    return MAP[str(v).strip().lower()]
 
 RAIN_CHANCE = random.randint(0,100)
 
-# parameters voor connectie met de database
 db = Database(host="localhost", gebruiker="root", wachtwoord="Lily8-Pancake7", database="attractiepark")
-
-
-# main
-
-# Haal de eigenschappen op van een personeelslid
-# altijd verbinding openen om query's uit te voeren
 db.connect()
 
-# pas deze query aan om het juiste personeelslid te selecteren
 select_query = "SELECT * FROM personeelslid"
 personeelsleden = db.execute_query(select_query)
 
-# altijd verbinding sluiten met de database als je klaar bent
 db.close()
 
 def ask_for_person_index() -> int:
@@ -41,7 +42,7 @@ def ask_for_person_index() -> int:
     for persoon in personeelsleden:
         names.append(persoon['naam'])
         print(persoon['naam'])
-    
+
     lowercase_list = [item.lower() for item in names]
 
     while True:
@@ -88,11 +89,9 @@ for taak in onderhoudstaken:
     bevoegdheid = taak['bevoegdheid']
     fysieke_belasting = taak['fysieke_belasting']
 
-    if beroepstype == personeelsleden[person_idx]['beroepstype'] and bevoegdheid <= personeelsleden[person_idx]['bevoegdheid'] and bereken_maximale_belasting(personeelslid=personeelsleden[person_idx]) >= fysieke_belasting:
+    # bevoegdheid shit werkt niet perfect
+    if beroepstype == personeelsleden[person_idx]['beroepstype'] and to_level(bevoegdheid) <= to_level(personeelsleden[person_idx]['bevoegdheid']) and bereken_maximale_belasting(personeelslid=personeelsleden[person_idx]) >= fysieke_belasting:
         user_taken.append(taak)
-        # print(beroepstype)
-        # print(bevoegdheid)
-        # print(fysieke_belasting)
 
 # bereken taak duur
 totale_duur = 0
