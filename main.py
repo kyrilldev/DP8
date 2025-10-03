@@ -92,9 +92,74 @@ for taak in onderhoudstaken:
     fysieke_belasting = taak['fysieke_belasting']
 
     if beroepstype == personeelsleden[person_idx]['beroepstype'] and to_level(bevoegdheid) <= to_level(personeelsleden[person_idx]['bevoegdheid']) and bereken_maximale_belasting(personeelslid=personeelsleden[person_idx]) >= fysieke_belasting:
-        if personeelsleden[person_idx]['werktijd'] >= totale_taak_duur + taak['duur']:
-            totale_taak_duur += taak['duur']
-            user_taken.append(taak)
+        werktijd = personeelsleden[person_idx]['werktijd']
+        remaining = werktijd - totale_taak_duur
+
+        # Als we nog >30 min over hebben: plan normaal (alles dat past)
+        if remaining > 30:
+            if taak['duur'] <= remaining:
+                user_taken.append(taak)
+                totale_taak_duur += taak['duur']
+
+        else:
+            if 0 < taak['duur'] <= remaining:
+                user_taken.append(taak)
+                totale_taak_duur += taak['duur']
+                break
+
+def voeg_administratie_tijd_toe(taken: list) -> int:
+    '''Berekent en voegt administratie toe aan de taken lijst'''
+    tijd_per_taak = 2
+    admin_tijd = 0
+    for taak in taken:
+        admin_tijd += tijd_per_taak
+
+    taak = {
+        "naam": "administratietijd",
+        "duur": admin_tijd,
+    }
+    taken.append(taak)
+    return admin_tijd
+
+def voeg_pauzes_toe(taken: list, duur: int, spiltsen: bool) -> list:
+    '''Voegt pauzes toe ongeveer in het midden wanneer de werktijd langer is dan 5.5 uur'''
+
+    def calc_insert_index(base_list: list, target_min: float) -> int:
+        cumul = 0
+        prev_cumul = 0
+        for idx, taak in enumerate(base_list):
+            d = taak['duur']
+            prev_cumul = cumul
+            cumul += d
+            if cumul >= target_min:
+                dist_voor = target_min - prev_cumul
+                dist_na   = cumul - target_min
+                return idx if dist_voor <= dist_na else idx + 1
+        return len(base_list)
+    
+    if duur <= 330:
+        return taken
+
+    if not spiltsen:
+        midden = duur / 2
+        insert_at = calc_insert_index(taken, midden)
+        taken.insert(insert_at, {"naam": "pauze", "duur": 30})
+        return taken
+    else:
+        # eerste 3e en tweede 3e van de dag
+        targets = [duur / 3, 2 * duur / 3]
+
+        base = taken
+        idx1 = calc_insert_index(base, targets[0])
+        idx2_base = calc_insert_index(base, targets[1])
+
+        # eerste pauze
+        taken.insert(idx1, {"naam": "pauze", "duur": 15})
+
+        # tweede pauze | corrigeer index voor de verschuiving door de eerste
+        idx2 = idx2_base + 1 if idx2_base >= idx1 else idx2_base
+        taken.insert(idx2, {"naam": "pauze", "duur": 15})
+        return taken
 
 regen_kans = f"{RAIN_CHANCE}%"
 
@@ -103,6 +168,8 @@ def sorteer_taken_op_bevoegdheid(taken: list) -> list:
     return taken
 
 user_taken = sorteer_taken_op_bevoegdheid(user_taken)
+totale_taak_duur += voeg_administratie_tijd_toe(user_taken)
+user_taken = voeg_pauzes_toe(user_taken, totale_taak_duur, personeelsleden[person_idx]['pauze_opsplitsen'])
 
 # verzamel alle benodigde gegevens in een dictionary
 dagtakenlijst = {

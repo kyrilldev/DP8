@@ -1,0 +1,115 @@
+{
+    "personeelsgegevens": {
+        "personeelslid": {
+            "id": 4,
+            "naam": "Angela Bakker",
+            "werktijd": 360,
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Stagiair",
+            "specialist_in_attracties": "",
+            "pauze_opsplitsen": 1,
+            "leeftijd": 32,
+            "verlaagde_fysieke_belasting": 0
+        }
+    },
+    "dagtaken": [
+        {
+            "id": 9,
+            "omschrijving": "Herstel van veiligheidsbeugels",
+            "duur": 90,
+            "prioriteit": "laag",
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Stagiair",
+            "fysieke_belasting": 10,
+            "attractie": "Family Carousel",
+            "is_buitenwerk": 0,
+            "afgerond": 0,
+            "x_coord": 67.0157,
+            "y_coord": -50.7468
+        },
+        {
+            "id": 19,
+            "omschrijving": "Schoonmaak van filters",
+            "duur": 60,
+            "prioriteit": "laag",
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Stagiair",
+            "fysieke_belasting": 10,
+            "attractie": "Waterfall Adventure",
+            "is_buitenwerk": 0,
+            "afgerond": 1,
+            "x_coord": 67.0163,
+            "y_coord": -50.7005
+        },
+        {
+            "naam": "pauze",
+            "duur": 15
+        },
+        {
+            "id": 34,
+            "omschrijving": "Schoonmaak van looppaden",
+            "duur": 60,
+            "prioriteit": "laag",
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Stagiair",
+            "fysieke_belasting": 5,
+            "attractie": null,
+            "is_buitenwerk": 1,
+            "afgerond": 1,
+            "x_coord": 67.0173,
+            "y_coord": -50.7698
+        },
+        {
+            "id": 46,
+            "omschrijving": "Reparatie aan picknickbanken",
+            "duur": 60,
+            "prioriteit": "laag",
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Stagiair",
+            "fysieke_belasting": 5,
+            "attractie": null,
+            "is_buitenwerk": 1,
+            "afgerond": 1,
+            "x_coord": 67.0192,
+            "y_coord": -50.7259
+        },
+        {
+            "naam": "pauze",
+            "duur": 15
+        },
+        {
+            "id": 58,
+            "omschrijving": "Schoonmaak van looppaden",
+            "duur": 60,
+            "prioriteit": "laag",
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Stagiair",
+            "fysieke_belasting": 5,
+            "attractie": null,
+            "is_buitenwerk": 1,
+            "afgerond": 1,
+            "x_coord": 67.0095,
+            "y_coord": -50.7304
+        },
+        {
+            "id": 91,
+            "omschrijving": "Schoonmaken van technische oppervlakken",
+            "duur": 30,
+            "prioriteit": "laag",
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Stagiair",
+            "fysieke_belasting": 5,
+            "attractie": "Thunder Falls",
+            "is_buitenwerk": 1,
+            "afgerond": 1,
+            "x_coord": 67.0211,
+            "y_coord": -50.7421
+        },
+        {
+            "naam": "administratietijd",
+            "duur": 12
+        }
+    ],
+    "weer": "34%",
+    "totale_duur": 372
+}
