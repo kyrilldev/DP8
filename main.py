@@ -76,12 +76,14 @@ db.connect()
 
 query = "SELECT * FROM onderhoudstaak"
 onderhoudstaken = db.execute_query(query)
-# pprint.pp(onderhoudstaken)
+
 db.close()
 
 user_taken = []
 
 pprint.pp(personeelsleden[person_idx])
+
+totale_taak_duur = 0
 
 # verzamel taken
 for taak in onderhoudstaken:
@@ -89,26 +91,28 @@ for taak in onderhoudstaken:
     bevoegdheid = taak['bevoegdheid']
     fysieke_belasting = taak['fysieke_belasting']
 
-    # bevoegdheid shit werkt niet perfect
     if beroepstype == personeelsleden[person_idx]['beroepstype'] and to_level(bevoegdheid) <= to_level(personeelsleden[person_idx]['bevoegdheid']) and bereken_maximale_belasting(personeelslid=personeelsleden[person_idx]) >= fysieke_belasting:
-        user_taken.append(taak)
-
-# bereken taak duur
-totale_duur = 0
-for taak in user_taken:
-    totale_duur += taak['duur']
+        if personeelsleden[person_idx]['werktijd'] >= totale_taak_duur + taak['duur']:
+            totale_taak_duur += taak['duur']
+            user_taken.append(taak)
 
 regen_kans = f"{RAIN_CHANCE}%"
+
+def sorteer_taken_op_bevoegdheid(taken: list) -> list:
+    taken.sort(key=lambda x: x['bevoegdheid'], reverse=True)
+    return taken
+
+user_taken = sorteer_taken_op_bevoegdheid(user_taken)
 
 # verzamel alle benodigde gegevens in een dictionary
 dagtakenlijst = {
     "personeelsgegevens" : {
-        "naam": personeelsleden[person_idx]
+        "personeelslid": personeelsleden[person_idx]
     },
     "dagtaken": user_taken
     ,
     "weer": regen_kans,
-    "totale_duur": totale_duur
+    "totale_duur": totale_taak_duur
 }
 
 # uiteindelijk schrijven we de dictionary weg naar een JSON-bestand, die kan worden ingelezen door de acceptatieomgeving
