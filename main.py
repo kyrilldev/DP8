@@ -144,7 +144,7 @@ for taak in onderhoudstaken:
     d = taak['duur']
     prio = str(taak.get('prioriteit', 'laag')).lower()  # 'laag' of 'hoog'
 
-    # Regenregel voor Schilders buitenwerk
+    # regenregel voor Schilders buitenwerk
     if (pers['beroepstype'] == "Schilder" and beroepstype == "Schilder" and RAIN_CHANCE >= 50 and taak['is_buitenwerk'] is True):
         continue
 
@@ -194,8 +194,8 @@ def voeg_administratie_tijd_toe(taken: list) -> int:
     taken.append(taak)
     return admin_tijd
 
-def voeg_pauzes_toe(taken: list, duur: int, spiltsen: bool) -> list:
-    '''Voegt pauzes toe ongeveer in het midden wanneer de werktijd langer is dan 5.5 uur'''
+def voeg_pauzes_toe(taken: list, duur: int, spiltsen: bool, taak_duur: int) -> list:
+    '''Voegt pauzes toe'''
 
     def calc_insert_index(base_list: list, target_min: float) -> int:
         cumul = 0
@@ -217,6 +217,26 @@ def voeg_pauzes_toe(taken: list, duur: int, spiltsen: bool) -> list:
         midden = duur / 2
         insert_at = calc_insert_index(taken, midden)
         taken.insert(insert_at, {"omschrijving": "pauze", "duur": 30})
+        return taken
+    elif tempratuur > 30:
+        targets = [duur / 3, duur / 2 ,2 * duur / 3]
+        base = taken
+        idx1 = calc_insert_index(base, targets[0])
+        idx2 = calc_insert_index(base, targets[1])
+        idx3 = calc_insert_index(base, targets[2])
+
+        # eerste pauze
+        taken.insert(idx1, {"omschrijving": "pauze", "duur": 15})
+
+        # tweede pauze
+        idx2_corr = idx2 + 1 if idx2 >= idx1 else idx2
+        taken.insert(idx2_corr, {"omschrijving": "pauze", "duur": 15, "reden": "temperatuur"})
+        taak_duur += 15
+
+        # derde pauze
+        shift = sum(1 for ins in (idx1, idx2) if idx3 >= ins)
+        idx3_corr = idx3 + shift + 1
+        taken.insert(idx3_corr, {"omschrijving": "pauze", "duur": 15})
         return taken
     else:
         # eerste 3e en tweede 3e van de dag
@@ -240,7 +260,7 @@ def sorteer_taken_op_bevoegdheid(taken: list) -> list:
 
 user_taken = sorteer_taken_op_bevoegdheid(user_taken)
 totale_taak_duur += voeg_administratie_tijd_toe(user_taken)
-user_taken = voeg_pauzes_toe(user_taken, totale_taak_duur, personeelsleden[person_idx]['pauze_opsplitsen'])
+user_taken = voeg_pauzes_toe(user_taken, totale_taak_duur, personeelsleden[person_idx]['pauze_opsplitsen'], totale_taak_duur)
 
 # verzamel alle benodigde gegevens in een dictionary
 dagtakenlijst = {

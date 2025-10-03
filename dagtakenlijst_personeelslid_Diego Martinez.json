@@ -79,7 +79,8 @@
         },
         {
             "omschrijving": "pauze",
-            "duur": 15
+            "duur": 15,
+            "reden": "temperatuur"
         },
         {
             "id": 23,
@@ -94,6 +95,10 @@
             "afgerond": 0,
             "x_coord": 67.0131,
             "y_coord": -50.7092
+        },
+        {
+            "omschrijving": "pauze",
+            "duur": 15
         },
         {
             "id": 37,
@@ -114,6 +119,7 @@
             "duur": 12
         }
     ],
-    "weer": "3%",
+    "weer": "65%",
+    "temperatuur": 33,
     "totale_duur": 372
 }
