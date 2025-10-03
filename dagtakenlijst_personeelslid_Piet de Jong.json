@@ -12,7 +12,6 @@
             "verlaagde_fysieke_belasting": 30
         }
     },
-    "weer": "2%",
     "dagtaken": [
         {
             "id": 3,
@@ -323,5 +322,6 @@
             "y_coord": -50.7294
         }
     ],
+    "weer": "59%",
     "totale_duur": 1130
 }

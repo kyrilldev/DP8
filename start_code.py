@@ -24,7 +24,6 @@ db = Database(host="localhost", gebruiker="root", wachtwoord="Lily8-Pancake7", d
 
 # main
 
-
 # Haal de eigenschappen op van een personeelslid
 # altijd verbinding openen om query's uit te voeren
 db.connect()
@@ -35,6 +34,27 @@ personeelsleden = db.execute_query(select_query)
 
 # altijd verbinding sluiten met de database als je klaar bent
 db.close()
+
+def ask_for_person_index() -> int:
+    '''asks for a person in the system and validates input'''
+    names = []
+    for persoon in personeelsleden:
+        names.append(persoon['naam'])
+        print(persoon['naam'])
+    
+    lowercase_list = [item.lower() for item in names]
+
+    while True:
+        selection = input("who are you?\n")
+        print(selection)
+        if type(selection) == str and len(selection) < 45 and selection.lower() in lowercase_list:
+            break
+        else:
+            print("Input not valid, please try again!")
+
+    return lowercase_list.index(selection)
+
+person_idx = ask_for_person_index()
 
 def bereken_maximale_belasting(personeelslid) -> int:
     '''berekend de maximale belasting van een personeelslid'''
@@ -60,7 +80,7 @@ db.close()
 
 user_taken = []
 
-pprint.pp(personeelsleden[0])
+pprint.pp(personeelsleden[person_idx])
 
 # verzamel taken
 for taak in onderhoudstaken:
@@ -68,30 +88,30 @@ for taak in onderhoudstaken:
     bevoegdheid = taak['bevoegdheid']
     fysieke_belasting = taak['fysieke_belasting']
 
-    if beroepstype == personeelsleden[0]['beroepstype'] and bevoegdheid <= personeelsleden[0]['bevoegdheid'] and bereken_maximale_belasting(personeelslid=personeelsleden[0]) >= fysieke_belasting:
+    if beroepstype == personeelsleden[person_idx]['beroepstype'] and bevoegdheid <= personeelsleden[person_idx]['bevoegdheid'] and bereken_maximale_belasting(personeelslid=personeelsleden[person_idx]) >= fysieke_belasting:
         user_taken.append(taak)
-        print(beroepstype)
-        print(bevoegdheid)
-        print(fysieke_belasting)
+        # print(beroepstype)
+        # print(bevoegdheid)
+        # print(fysieke_belasting)
 
 # bereken taak duur
 totale_duur = 0
 for taak in user_taken:
     totale_duur += taak['duur']
 
-
+regen_kans = f"{RAIN_CHANCE}%"
 
 # verzamel alle benodigde gegevens in een dictionary
 dagtakenlijst = {
     "personeelsgegevens" : {
-        "naam": personeelsleden[0] # voorbeeld van hoe je bij een eigenschap komt
-        # STAP 1: vul aan met andere benodigde eigenschappen
+        "naam": personeelsleden[person_idx]
     },
-    "dagtaken": user_taken # STAP 2: hier komt een lijst met alle dagtaken
+    "dagtaken": user_taken
     ,
-    "totale_duur": totale_duur # STAP 3: aanpassen naar daadwerkelijke totale duur
+    "weer": regen_kans,
+    "totale_duur": totale_duur
 }
 
 # uiteindelijk schrijven we de dictionary weg naar een JSON-bestand, die kan worden ingelezen door de acceptatieomgeving
-with open('dagtakenlijst_personeelslid_x.json', 'w') as json_bestand_uitvoer:
+with open(f"dagtakenlijst_personeelslid_{personeelsleden[person_idx]['naam']}.json", 'w') as json_bestand_uitvoer:
     json.dump(dagtakenlijst, json_bestand_uitvoer, indent=4)
