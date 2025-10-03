@@ -1,0 +1,10 @@
+{
+    "naam" : "Piet de Jong",
+    "werktijd": 240,
+    "beroepstype": "Mechanisch Monteur",
+    "bevoegdheid": "Senior",
+    "specialist_in_attracties": ["Mega Spin", "River Rapids", "Twister"],
+    "pauze_opsplitsen": false,
+    "leeftijd": 45,
+    "verlaagde_fysieke_belasting": 30
+}

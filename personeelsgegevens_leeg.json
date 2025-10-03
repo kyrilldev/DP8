@@ -1,0 +1,10 @@
+{
+    "naam" : "Leeg",
+    "werktijd": 0,
+    "beroepstype": "",
+    "bevoegdheid": "",
+    "specialist_in_attracties": [],
+    "pauze_opsplitsen": false,
+    "leeftijd": 0,
+    "verlaagde_fysieke_belasting": 0
+}

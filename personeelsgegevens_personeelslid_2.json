@@ -1,0 +1,10 @@
+{
+    "naam": "Aisha Rahmani",
+    "werktijd": 300,
+    "beroepstype": "Elektrisch Monteur",
+    "bevoegdheid": "Junior",
+    "specialist_in_attracties": ["Magic Forest"],
+    "pauze_opsplitsen": false,
+    "leeftijd": 26,
+    "verlaagde_fysieke_belasting": null
+}
