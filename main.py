@@ -5,6 +5,7 @@ import json
 import pprint
 import random
 from database_wrapper import Database
+import requests as req
 
 
 class Bevoegdheid(IntEnum):
@@ -27,6 +28,7 @@ def to_level(v) -> Bevoegdheid:
     return MAP[str(v).strip().lower()]
 
 RAIN_CHANCE = random.randint(0,100)
+# RAIN_CHANCE = 55
 
 db = Database(host="localhost", gebruiker="root", wachtwoord="Lily8-Pancake7", database="attractiepark")
 db.connect()
@@ -81,41 +83,112 @@ db.close()
 
 user_taken = []
 
-pprint.pp(personeelsleden[person_idx])
+def reserve_minuten_senior(werktijd_min: int) -> int:
+    '''Reserveer 60 min elke 120 min vanaf het begin van de dienst.'''
+    start = 120
+    blokken = 0
+    while start + 60 <= werktijd_min:
+        blokken += 1
+        start += 120
+    return blokken * 60
+
+
+# pprint.pp(personeelsleden[person_idx])
+regen_kans = f"{RAIN_CHANCE}%"
+
+def tempratuur_dag(unit: str = "C"):
+    url = "http://api.weatherapi.com/v1/current.json"
+    params = {"key": "e4a47bd82aca48e880b121521250310", "q": "Amsterdam", "aqi": "no"}
+    try:
+        r = req.get(url, params=params, timeout=10)
+        r.raise_for_status()
+        data = r.json()
+
+        if "error" in data:
+            raise ValueError(f"WeatherAPI error: {data['error'].get('message', 'unknown error')}")
+
+        current = data.get("current", {})
+        if unit.upper() == "F":
+            temp = current.get("temp_f")
+        else:
+            temp = current.get("temp_c")
+
+        if temp is None:
+            raise ValueError("Temperature not found in API response.")
+
+        return int(round(float(temp)))
+    except (req.RequestException, ValueError) as e:
+        raise RuntimeError(f"Failed to fetch temperature: {e}") from e
 
 totale_taak_duur = 0
 
-# verzamel taken
+pers = personeelsleden[person_idx]
+werktijd = pers['werktijd']
+
+tempratuur = tempratuur_dag()
+
+# senior?
+is_senior = str(pers['bevoegdheid']).lower() == "senior"
+
+reserve_totaal = reserve_minuten_senior(werktijd) if is_senior else 0
+
+normaal_gepland = 0
+reserve_gepland = 0
+
+normaal_gepland = totale_taak_duur
+
 for taak in onderhoudstaken:
     beroepstype = taak['beroepstype']
     bevoegdheid = taak['bevoegdheid']
     fysieke_belasting = taak['fysieke_belasting']
+    d = taak['duur']
+    prio = str(taak.get('prioriteit', 'laag')).lower()  # 'laag' of 'hoog'
 
-    if beroepstype == personeelsleden[person_idx]['beroepstype'] and to_level(bevoegdheid) <= to_level(personeelsleden[person_idx]['bevoegdheid']) and bereken_maximale_belasting(personeelslid=personeelsleden[person_idx]) >= fysieke_belasting:
-        werktijd = personeelsleden[person_idx]['werktijd']
-        remaining = werktijd - totale_taak_duur
+    # Regenregel voor Schilders buitenwerk
+    if (pers['beroepstype'] == "Schilder" and beroepstype == "Schilder" and RAIN_CHANCE >= 50 and taak['is_buitenwerk'] is True):
+        continue
 
-        # Als we nog >30 min over hebben: plan normaal (alles dat past)
-        if remaining > 30:
-            if taak['duur'] <= remaining:
+    if (beroepstype == pers['beroepstype'] and to_level(bevoegdheid) <= to_level(pers['bevoegdheid']) and bereken_maximale_belasting(personeelslid=pers) >= fysieke_belasting):
+
+        nonreserve_remaining = werktijd - reserve_totaal - normaal_gepland
+
+        if nonreserve_remaining > 30:
+            if d <= nonreserve_remaining:
                 user_taken.append(taak)
-                totale_taak_duur += taak['duur']
-
+                normaal_gepland += d
+                totale_taak_duur += d
         else:
-            if 0 < taak['duur'] <= remaining:
+            # eindsprint | maximaal een korte taak die nog in de non reserve past
+            if 0 < d <= nonreserve_remaining:
                 user_taken.append(taak)
-                totale_taak_duur += taak['duur']
-                break
+                normaal_gepland += d
+                totale_taak_duur += d
+                break  # precies een eind van de dag taak
+
+        # daarna reserve opvullen met lage prioriteit
+        if is_senior and prio == 'laag':
+            reserve_remaining = reserve_totaal - reserve_gepland
+            if d <= reserve_remaining:
+                # markeer als tijdelijk/swapbaar door middel van opmerking
+                taak_tmp = dict(taak)
+                taak_tmp['tijdelijk'] = True
+                taak_tmp['opmerking'] = "vult reserveruimte voor storingen"
+
+                user_taken.append(taak_tmp)
+                reserve_gepland += d
+                totale_taak_duur += d
+
 
 def voeg_administratie_tijd_toe(taken: list) -> int:
     '''Berekent en voegt administratie toe aan de taken lijst'''
     tijd_per_taak = 2
     admin_tijd = 0
     for taak in taken:
-        admin_tijd += tijd_per_taak
+        if taak['omschrijving'] != "pauze":
+            admin_tijd += tijd_per_taak
 
     taak = {
-        "naam": "administratietijd",
+        "omschrijving": "administratietijd",
         "duur": admin_tijd,
     }
     taken.append(taak)
@@ -143,7 +216,7 @@ def voeg_pauzes_toe(taken: list, duur: int, spiltsen: bool) -> list:
     if not spiltsen:
         midden = duur / 2
         insert_at = calc_insert_index(taken, midden)
-        taken.insert(insert_at, {"naam": "pauze", "duur": 30})
+        taken.insert(insert_at, {"omschrijving": "pauze", "duur": 30})
         return taken
     else:
         # eerste 3e en tweede 3e van de dag
@@ -154,14 +227,12 @@ def voeg_pauzes_toe(taken: list, duur: int, spiltsen: bool) -> list:
         idx2_base = calc_insert_index(base, targets[1])
 
         # eerste pauze
-        taken.insert(idx1, {"naam": "pauze", "duur": 15})
+        taken.insert(idx1, {"omschrijving": "pauze", "duur": 15})
 
-        # tweede pauze | corrigeer index voor de verschuiving door de eerste
+        # tweede pauze | corrigeert index voor de verschuiving door de eerste
         idx2 = idx2_base + 1 if idx2_base >= idx1 else idx2_base
-        taken.insert(idx2, {"naam": "pauze", "duur": 15})
+        taken.insert(idx2, {"omschrijving": "pauze", "duur": 15})
         return taken
-
-regen_kans = f"{RAIN_CHANCE}%"
 
 def sorteer_taken_op_bevoegdheid(taken: list) -> list:
     taken.sort(key=lambda x: x['bevoegdheid'], reverse=True)
@@ -179,6 +250,7 @@ dagtakenlijst = {
     "dagtaken": user_taken
     ,
     "weer": regen_kans,
+    "temperatuur": tempratuur,
     "totale_duur": totale_taak_duur
 }
 

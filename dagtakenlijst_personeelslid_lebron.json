@@ -14,22 +14,6 @@
     },
     "dagtaken": [
         {
-            "id": 86,
-            "omschrijving": "Bijwerken van verf op attractiepanelen",
-            "duur": 30,
-            "prioriteit": "laag",
-            "beroepstype": "Schilder",
-            "bevoegdheid": "Stagiair",
-            "fysieke_belasting": 5,
-            "attractie": "Sky Diver",
-            "is_buitenwerk": 1,
-            "afgerond": 0,
-            "x_coord": 67.0158,
-            "y_coord": -50.7228,
-            "tijdelijk": true,
-            "opmerking": "vult reserveruimte voor storingen"
-        },
-        {
             "id": 100,
             "omschrijving": "Schoonmaken van verfkwasten en materialen",
             "duur": 15,
@@ -58,27 +42,25 @@
             "y_coord": -50.7361
         },
         {
-            "omschrijving": "pauze",
+            "naam": "pauze",
             "duur": 15
         },
         {
-            "id": 2,
-            "omschrijving": "Schilderwerk bij onderhoudsplatform",
-            "duur": 90,
+            "id": 25,
+            "omschrijving": "Reparatie van decoratieonderdelen",
+            "duur": 120,
             "prioriteit": "laag",
             "beroepstype": "Schilder",
             "bevoegdheid": "Medior",
-            "fysieke_belasting": 10,
-            "attractie": "River Rapids",
-            "is_buitenwerk": 1,
+            "fysieke_belasting": 8,
+            "attractie": "Twist and Turn",
+            "is_buitenwerk": 0,
             "afgerond": 1,
-            "x_coord": 66.9886,
-            "y_coord": -50.7361,
-            "tijdelijk": true,
-            "opmerking": "vult reserveruimte voor storingen"
+            "x_coord": 67.0184,
+            "y_coord": -50.7116
         },
         {
-            "omschrijving": "pauze",
+            "naam": "pauze",
             "duur": 15
         },
         {
@@ -110,10 +92,10 @@
             "y_coord": -50.7288
         },
         {
-            "omschrijving": "administratietijd",
-            "duur": 12
+            "naam": "administratietijd",
+            "duur": 10
         }
     ],
-    "weer": "3%",
-    "totale_duur": 372
+    "weer": "55%",
+    "totale_duur": 370
 }
