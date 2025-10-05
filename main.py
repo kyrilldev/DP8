@@ -6,7 +6,7 @@ import pprint
 import random
 from database_wrapper import Database
 import requests as req
-
+import os
 
 class Bevoegdheid(IntEnum):
     STAGIAIR = 0
@@ -30,11 +30,45 @@ def to_level(v) -> Bevoegdheid:
 RAIN_CHANCE = random.randint(0,100)
 # RAIN_CHANCE = 55
 
+def get_source_type():
+    source = input("json or database?")
+    if source == "json":
+        print("chosen json")
+        return source
+    elif source == "database":
+        print("chosen database")
+        return source
+    else:
+        return get_source_type()
+    
+source = get_source_type()
+
 db = Database(host="localhost", gebruiker="root", wachtwoord="Lily8-Pancake7", database="attractiepark")
+
+personeelsleden = []
+onderhoudstaken = []
+
 db.connect()
 
-select_query = "SELECT * FROM personeelslid"
-personeelsleden = db.execute_query(select_query)
+if source == "json":
+    #get stuff from json files
+    files = ["personeelsgegevens_personeelslid_1.json", "personeelsgegevens_personeelslid_2.json", "personeelsgegevens_personeelslid_3.json", "personeelsgegevens_personeelslid_4.json"]
+    
+    for file in files:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        json_path = os.path.join(current_dir, file)
+        with open(json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, list):
+            personeelsleden.extend(data)
+        else:
+            personeelsleden.append(data)
+else:
+    select_query = "SELECT * FROM personeelslid"
+    personeelsleden = db.execute_query(select_query)
+
+query = "SELECT * FROM onderhoudstaak"
+onderhoudstaken = db.execute_query(query)
 
 db.close()
 
@@ -49,7 +83,6 @@ def ask_for_person_index() -> int:
 
     while True:
         selection = input("who are you?\n")
-        print(selection)
         if type(selection) == str and len(selection) < 45 and selection.lower() in lowercase_list:
             break
         else:
@@ -73,13 +106,6 @@ def bereken_maximale_belasting(personeelslid) -> int:
             return 20
     else:
         return verlaagde_fysieke_belasting
-    
-db.connect()
-
-query = "SELECT * FROM onderhoudstaak"
-onderhoudstaken = db.execute_query(query)
-
-db.close()
 
 user_taken = []
 
@@ -92,9 +118,7 @@ def reserve_minuten_senior(werktijd_min: int) -> int:
         start += 120
     return blokken * 60
 
-
-# pprint.pp(personeelsleden[person_idx])
-regen_kans = f"{RAIN_CHANCE}%"
+regen_kans = RAIN_CHANCE
 
 def tempratuur_dag(unit: str = "C"):
     url = "http://api.weatherapi.com/v1/current.json"
@@ -120,9 +144,21 @@ def tempratuur_dag(unit: str = "C"):
     except (req.RequestException, ValueError) as e:
         raise RuntimeError(f"Failed to fetch temperature: {e}") from e
 
+STORING_INTERVAL_MIN = 120
+STORING_BLOK_MIN     = 60
+volgende_storing_na  = STORING_INTERVAL_MIN
+
 totale_taak_duur = 0
 
-pers = personeelsleden[person_idx]
+pers = {
+    "naam": personeelsleden[person_idx]['naam'],    
+    "werktijd": personeelsleden[person_idx]['werktijd'],    
+    "beroepstype": personeelsleden[person_idx]['beroepstype'],    
+    "bevoegdheid": personeelsleden[person_idx]['bevoegdheid'],    
+    "specialist_in_attracties": personeelsleden[person_idx]['specialist_in_attracties'],    
+    "pauze_opsplitsen": personeelsleden[person_idx]['pauze_opsplitsen'],    
+    "max_fysieke_belasting": bereken_maximale_belasting(personeelsleden[person_idx]),    
+}
 werktijd = pers['werktijd']
 
 tempratuur = tempratuur_dag()
@@ -148,7 +184,7 @@ for taak in onderhoudstaken:
     if (pers['beroepstype'] == "Schilder" and beroepstype == "Schilder" and RAIN_CHANCE >= 50 and taak['is_buitenwerk'] is True):
         continue
 
-    if (beroepstype == pers['beroepstype'] and to_level(bevoegdheid) <= to_level(pers['bevoegdheid']) and bereken_maximale_belasting(personeelslid=pers) >= fysieke_belasting):
+    if (beroepstype == pers['beroepstype'] and to_level(bevoegdheid) <= to_level(pers['bevoegdheid']) and bereken_maximale_belasting(personeelsleden[person_idx]) >= fysieke_belasting):
 
         nonreserve_remaining = werktijd - reserve_totaal - normaal_gepland
 
@@ -165,34 +201,110 @@ for taak in onderhoudstaken:
                 totale_taak_duur += d
                 break  # precies een eind van de dag taak
 
-        # daarna reserve opvullen met lage prioriteit
-        if is_senior and prio == 'laag':
+        while is_senior and reserve_gepland < reserve_totaal and normaal_gepland >= volgende_storing_na:
             reserve_remaining = reserve_totaal - reserve_gepland
-            if d <= reserve_remaining:
-                # markeer als tijdelijk/swapbaar door middel van opmerking
-                taak_tmp = dict(taak)
-                taak_tmp['tijdelijk'] = True
-                taak_tmp['opmerking'] = "vult reserveruimte voor storingen"
+            if reserve_remaining <= 0:
+                break
 
-                user_taken.append(taak_tmp)
-                reserve_gepland += d
-                totale_taak_duur += d
+            target = STORING_BLOK_MIN if STORING_BLOK_MIN <= reserve_remaining else reserve_remaining
+
+            alternatieven = []
+            alternatieven_duur = 0
+
+            # voorkeur: 30 min taken eerst
+            kandidaten = sorted(
+                onderhoudstaken,
+                key=lambda t: (abs(int(t.get('duur',0)) - 30), int(t.get('duur',0)))
+            )
+
+            for alt in kandidaten:
+                if str(alt.get('prioriteit','laag')).lower() != 'laag':
+                    continue
+                if alt.get('beroepstype') != pers['beroepstype']:
+                    continue
+                # bevoegdheid niet hoger dan eigen
+                if to_level(alt.get('bevoegdheid')) > to_level(pers['bevoegdheid']):
+                    continue
+                if int(alt.get('fysieke_belasting',0)) > int(pers['max_fysieke_belasting']):
+                    continue
+                if (pers['beroepstype'] == "Schilder" and RAIN_CHANCE >= 50 and bool(alt.get('is_buitenwerk'))):
+                    continue
+
+                # taak duur vergelijken
+                d_alt = int(alt.get('duur', 0))
+                if d_alt <= 0:
+                    continue
+                if alternatieven_duur + d_alt <= target:
+                    alternatieven.append(alt)
+                    alternatieven_duur += d_alt
+                if alternatieven_duur >= target or len(alternatieven) >= 3:
+                    break
+
+            # volgende storing berekenen
+            if not alternatieven or alternatieven_duur <= 0:
+                volgende_storing_na += STORING_INTERVAL_MIN
+                break
+
+            storingsblok = {
+                "type": "storingen",
+                "alternatieve_onderhoudstaken": [
+                    {
+                        "omschrijving": a.get("omschrijving"),
+                        "duur": int(a.get("duur",0)),
+                        "prioriteit": str(a.get("prioriteit","laag")).capitalize(),
+                        "beroepstype": a.get("beroepstype"),
+                        "bevoegdheid": a.get("bevoegdheid"),
+                        "fysieke_belasting": a.get("fysieke_belasting"),
+                        "attractie": a.get("attractie"),
+                        "is_buitenwerk": a.get("is_buitenwerk")
+                    } for a in alternatieven
+                ]
+            }
+
+            user_taken.append(storingsblok)
+
+            reserve_gepland  += alternatieven_duur
+            totale_taak_duur += alternatieven_duur
+
+            volgende_storing_na += STORING_INTERVAL_MIN
+
+
 
 
 def voeg_administratie_tijd_toe(taken: list) -> int:
     '''Berekent en voegt administratie toe aan de taken lijst'''
     tijd_per_taak = 2
     admin_tijd = 0
-    for taak in taken:
-        if taak['omschrijving'] != "pauze":
-            admin_tijd += tijd_per_taak
+    aantal_taken = 0
 
+    for taak in taken:
+        if taak.get('type') == 'storingen':
+            alternatieven = taak.get('alternatieve_onderhoudstaken') or []
+            cnt = sum(1 for a in alternatieven
+                      if str(a.get('omschrijving', '')).lower() not in ('pauze', 'administratietijd'))
+            if cnt > 0:
+                admin_tijd += cnt * tijd_per_taak
+                aantal_taken += cnt
+            continue
+
+        oms = taak.get('omschrijving')
+        if not oms:
+            continue
+        if str(oms).lower() in ('pauze', 'administratietijd'):
+            continue
+
+        admin_tijd += tijd_per_taak
+        aantal_taken += 1
+
+    # 3) Admin-taak toevoegen
     taak = {
         "omschrijving": "administratietijd",
+        "aantal_taken": aantal_taken,
         "duur": admin_tijd,
     }
     taken.append(taak)
     return admin_tijd
+
 
 def voeg_pauzes_toe(taken: list, duur: int, spiltsen: bool, taak_duur: int) -> list:
     '''Voegt pauzes toe'''
@@ -255,8 +367,20 @@ def voeg_pauzes_toe(taken: list, duur: int, spiltsen: bool, taak_duur: int) -> l
         return taken
 
 def sorteer_taken_op_bevoegdheid(taken: list) -> list:
-    taken.sort(key=lambda x: x['bevoegdheid'], reverse=True)
+    def _req_level(taak: dict) -> int:
+        # Storingen-blok
+        if taak.get("type") == "storingen":
+            alts = taak.get("alternatieve_onderhoudstaken") or []
+            if not alts:
+                return -1
+            levels = [to_level(a.get("bevoegdheid")) for a in alts]
+            return max((lv for lv in levels if lv is not None), default=-1)
+        # Normale taak
+        return to_level(taak.get("bevoegdheid"))
+
+    taken.sort(key=_req_level, reverse=True)
     return taken
+
 
 user_taken = sorteer_taken_op_bevoegdheid(user_taken)
 totale_taak_duur += voeg_administratie_tijd_toe(user_taken)
@@ -264,16 +388,13 @@ user_taken = voeg_pauzes_toe(user_taken, totale_taak_duur, personeelsleden[perso
 
 # verzamel alle benodigde gegevens in een dictionary
 dagtakenlijst = {
-    "personeelsgegevens" : {
-        "personeelslid": personeelsleden[person_idx]
-    },
+    "personeelsgegevens" : pers,
+    "weergegevens": {"tempratuur": tempratuur, "regenkans": regen_kans},
     "dagtaken": user_taken
     ,
-    "weer": regen_kans,
-    "temperatuur": tempratuur,
     "totale_duur": totale_taak_duur
 }
 
 # uiteindelijk schrijven we de dictionary weg naar een JSON-bestand, die kan worden ingelezen door de acceptatieomgeving
-with open(f"dagtakenlijst_personeelslid_{personeelsleden[person_idx]['naam']}.json", 'w') as json_bestand_uitvoer:
+with open(f"dagtakenlijst_personeelslid_{personeelsleden[person_idx]['naam']}.json", 'w', encoding='utf-8') as json_bestand_uitvoer:
     json.dump(dagtakenlijst, json_bestand_uitvoer, indent=4)

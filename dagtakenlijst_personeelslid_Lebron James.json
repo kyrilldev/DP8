@@ -1,0 +1,99 @@
+{
+    "personeelsgegevens": {
+        "personeelslid": {
+            "id": 5,
+            "naam": "Lebron James",
+            "werktijd": 360,
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Junior",
+            "specialist_in_attracties": "",
+            "pauze_opsplitsen": 0,
+            "leeftijd": 23,
+            "verlaagde_fysieke_belasting": 0
+        }
+    },
+    "dagtaken": [
+        {
+            "id": 9,
+            "omschrijving": "Herstel van veiligheidsbeugels",
+            "duur": 90,
+            "prioriteit": "laag",
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Stagiair",
+            "fysieke_belasting": 10,
+            "attractie": "Family Carousel",
+            "is_buitenwerk": 0,
+            "afgerond": 0,
+            "x_coord": 67.0157,
+            "y_coord": -50.7468
+        },
+        {
+            "id": 19,
+            "omschrijving": "Schoonmaak van filters",
+            "duur": 60,
+            "prioriteit": "laag",
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Stagiair",
+            "fysieke_belasting": 10,
+            "attractie": "Waterfall Adventure",
+            "is_buitenwerk": 0,
+            "afgerond": 1,
+            "x_coord": 67.0163,
+            "y_coord": -50.7005
+        },
+        {
+            "omschrijving": "pauze",
+            "duur": 30
+        },
+        {
+            "id": 14,
+            "omschrijving": "Controle op lekkages",
+            "duur": 90,
+            "prioriteit": "hoog",
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Junior",
+            "fysieke_belasting": 12,
+            "attractie": "Lightning Loop",
+            "is_buitenwerk": 0,
+            "afgerond": 1,
+            "x_coord": 67.0116,
+            "y_coord": -50.7038
+        },
+        {
+            "id": 17,
+            "omschrijving": "Smering van hydraulische armen",
+            "duur": 45,
+            "prioriteit": "laag",
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Junior",
+            "fysieke_belasting": 20,
+            "attractie": "Dragon Quest",
+            "is_buitenwerk": 0,
+            "afgerond": 1,
+            "x_coord": 67.0105,
+            "y_coord": -50.7299
+        },
+        {
+            "id": 30,
+            "omschrijving": "Controle op slijtage",
+            "duur": 60,
+            "prioriteit": "hoog",
+            "beroepstype": "Onderhoudsmonteur",
+            "bevoegdheid": "Junior",
+            "fysieke_belasting": 8,
+            "attractie": "Fairy Tale Ride",
+            "is_buitenwerk": 0,
+            "afgerond": 0,
+            "x_coord": 67.0144,
+            "y_coord": -50.7179
+        },
+        {
+            "omschrijving": "administratietijd",
+            "duur": 10
+        }
+    ],
+    "weer": "15%",
+    "temperatuur": 14,
+    "totale_duur": 355,
+    "maximale_fysieke_belasting": 25
+}

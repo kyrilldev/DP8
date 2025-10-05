@@ -1,0 +1,99 @@
+{
+    "personeelsgegevens": {
+        "personeelslid": {
+            "id": 6,
+            "naam": "Johan",
+            "werktijd": 331,
+            "beroepstype": "Schilder",
+            "bevoegdheid": "Medior",
+            "specialist_in_attracties": "",
+            "pauze_opsplitsen": 0,
+            "leeftijd": 53,
+            "verlaagde_fysieke_belasting": 0
+        }
+    },
+    "dagtaken": [
+        {
+            "id": 100,
+            "omschrijving": "Schoonmaken van verfkwasten en materialen",
+            "duur": 15,
+            "prioriteit": "laag",
+            "beroepstype": "Schilder",
+            "bevoegdheid": "Stagiair",
+            "fysieke_belasting": 4,
+            "attractie": null,
+            "is_buitenwerk": 0,
+            "afgerond": 0,
+            "x_coord": 67.0108,
+            "y_coord": -50.7253
+        },
+        {
+            "id": 2,
+            "omschrijving": "Schilderwerk bij onderhoudsplatform",
+            "duur": 90,
+            "prioriteit": "laag",
+            "beroepstype": "Schilder",
+            "bevoegdheid": "Medior",
+            "fysieke_belasting": 10,
+            "attractie": "River Rapids",
+            "is_buitenwerk": 1,
+            "afgerond": 1,
+            "x_coord": 66.9886,
+            "y_coord": -50.7361
+        },
+        {
+            "id": 25,
+            "omschrijving": "Reparatie van decoratieonderdelen",
+            "duur": 120,
+            "prioriteit": "laag",
+            "beroepstype": "Schilder",
+            "bevoegdheid": "Medior",
+            "fysieke_belasting": 8,
+            "attractie": "Twist and Turn",
+            "is_buitenwerk": 0,
+            "afgerond": 1,
+            "x_coord": 67.0184,
+            "y_coord": -50.7116
+        },
+        {
+            "omschrijving": "pauze",
+            "duur": 30
+        },
+        {
+            "id": 42,
+            "omschrijving": "Schilderwerk in openbare ruimtes",
+            "duur": 45,
+            "prioriteit": "laag",
+            "beroepstype": "Schilder",
+            "bevoegdheid": "Medior",
+            "fysieke_belasting": 8,
+            "attractie": null,
+            "is_buitenwerk": 1,
+            "afgerond": 1,
+            "x_coord": 67.0211,
+            "y_coord": -50.7421
+        },
+        {
+            "id": 23,
+            "omschrijving": "Vervanging van panelen",
+            "duur": 60,
+            "prioriteit": "laag",
+            "beroepstype": "Schilder",
+            "bevoegdheid": "Junior",
+            "fysieke_belasting": 12,
+            "attractie": "Looping Dragon",
+            "is_buitenwerk": 1,
+            "afgerond": 0,
+            "x_coord": 67.0131,
+            "y_coord": -50.7092
+        },
+        {
+            "omschrijving": "administratietijd",
+            "duur": 10
+        }
+    ],
+    "weer": "7%",
+    "temperatuur": 10,
+    "totale_duur": 340,
+    "maximale_fysieke_belasting": 20
+}

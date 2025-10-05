@@ -1,0 +1,80 @@
+{
+    "personeelsgegevens": {
+        "naam": "Piet de Jong",
+        "werktijd": 240,
+        "beroepstype": "Mechanisch Monteur",
+        "bevoegdheid": "Senior",
+        "specialist_in_attracties": [
+            "Mega Spin",
+            "River Rapids",
+            "Twister"
+        ],
+        "pauze_opsplitsen": false,
+        "max_fysieke_belasting": 30
+    },
+    "weergegevens": {
+        "tempratuur": 13,
+        "regenkans": 74
+    },
+    "dagtaken": [
+        {
+            "id": 3,
+            "omschrijving": "Mechanisch onderhoud aan scharnieren",
+            "duur": 45,
+            "prioriteit": "hoog",
+            "beroepstype": "Mechanisch Monteur",
+            "bevoegdheid": "Senior",
+            "fysieke_belasting": 25,
+            "attractie": "Twister",
+            "is_buitenwerk": 0,
+            "afgerond": 0,
+            "x_coord": 67.0173,
+            "y_coord": -50.7698
+        },
+        {
+            "id": 5,
+            "omschrijving": "Reparatie aan karretjes",
+            "duur": 120,
+            "prioriteit": "hoog",
+            "beroepstype": "Mechanisch Monteur",
+            "bevoegdheid": "Senior",
+            "fysieke_belasting": 20,
+            "attractie": "Galactic Journey",
+            "is_buitenwerk": 1,
+            "afgerond": 0,
+            "x_coord": 67.0214,
+            "y_coord": -50.7358
+        },
+        {
+            "type": "storingen",
+            "alternatieve_onderhoudstaken": [
+                {
+                    "omschrijving": "Smering van tandwielen",
+                    "duur": 30,
+                    "prioriteit": "Laag",
+                    "beroepstype": "Mechanisch Monteur",
+                    "bevoegdheid": "Junior",
+                    "fysieke_belasting": 8,
+                    "attractie": "Rocket Ride",
+                    "is_buitenwerk": 1
+                },
+                {
+                    "omschrijving": "Inspectie van hydraulische cilinders",
+                    "duur": 30,
+                    "prioriteit": "Laag",
+                    "beroepstype": "Mechanisch Monteur",
+                    "bevoegdheid": "Medior",
+                    "fysieke_belasting": 10,
+                    "attractie": "Wave Rider",
+                    "is_buitenwerk": 0
+                }
+            ]
+        },
+        {
+            "omschrijving": "administratietijd",
+            "aantal_taken": 4,
+            "duur": 8
+        }
+    ],
+    "totale_duur": 233
+}

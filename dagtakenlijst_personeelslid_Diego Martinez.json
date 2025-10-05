@@ -1,48 +1,18 @@
 {
     "personeelsgegevens": {
-        "personeelslid": {
-            "id": 3,
-            "naam": "Diego Martinez",
-            "werktijd": 360,
-            "beroepstype": "Schilder",
-            "bevoegdheid": "Senior",
-            "specialist_in_attracties": "",
-            "pauze_opsplitsen": 1,
-            "leeftijd": 53,
-            "verlaagde_fysieke_belasting": 0
-        }
+        "naam": "Diego Martinez",
+        "werktijd": 360,
+        "beroepstype": "Schilder",
+        "bevoegdheid": "Senior",
+        "specialist_in_attracties": "",
+        "pauze_opsplitsen": 1,
+        "max_fysieke_belasting": 20
+    },
+    "weergegevens": {
+        "tempratuur": 13,
+        "regenkans": 41
     },
     "dagtaken": [
-        {
-            "id": 86,
-            "omschrijving": "Bijwerken van verf op attractiepanelen",
-            "duur": 30,
-            "prioriteit": "laag",
-            "beroepstype": "Schilder",
-            "bevoegdheid": "Stagiair",
-            "fysieke_belasting": 5,
-            "attractie": "Sky Diver",
-            "is_buitenwerk": 1,
-            "afgerond": 0,
-            "x_coord": 67.0158,
-            "y_coord": -50.7228,
-            "tijdelijk": true,
-            "opmerking": "vult reserveruimte voor storingen"
-        },
-        {
-            "id": 100,
-            "omschrijving": "Schoonmaken van verfkwasten en materialen",
-            "duur": 15,
-            "prioriteit": "laag",
-            "beroepstype": "Schilder",
-            "bevoegdheid": "Stagiair",
-            "fysieke_belasting": 4,
-            "attractie": null,
-            "is_buitenwerk": 0,
-            "afgerond": 0,
-            "x_coord": 67.0108,
-            "y_coord": -50.7253
-        },
         {
             "id": 2,
             "omschrijving": "Schilderwerk bij onderhoudsplatform",
@@ -58,29 +28,29 @@
             "y_coord": -50.7361
         },
         {
-            "omschrijving": "pauze",
-            "duur": 15
-        },
-        {
-            "id": 2,
-            "omschrijving": "Schilderwerk bij onderhoudsplatform",
-            "duur": 90,
-            "prioriteit": "laag",
-            "beroepstype": "Schilder",
-            "bevoegdheid": "Medior",
-            "fysieke_belasting": 10,
-            "attractie": "River Rapids",
-            "is_buitenwerk": 1,
-            "afgerond": 1,
-            "x_coord": 66.9886,
-            "y_coord": -50.7361,
-            "tijdelijk": true,
-            "opmerking": "vult reserveruimte voor storingen"
-        },
-        {
-            "omschrijving": "pauze",
-            "duur": 15,
-            "reden": "temperatuur"
+            "type": "storingen",
+            "alternatieve_onderhoudstaken": [
+                {
+                    "omschrijving": "Bijwerken van verf op attractiepanelen",
+                    "duur": 30,
+                    "prioriteit": "Laag",
+                    "beroepstype": "Schilder",
+                    "bevoegdheid": "Stagiair",
+                    "fysieke_belasting": 5,
+                    "attractie": "Sky Diver",
+                    "is_buitenwerk": 1
+                },
+                {
+                    "omschrijving": "Schilderen van decoratieve randen",
+                    "duur": 30,
+                    "prioriteit": "Laag",
+                    "beroepstype": "Schilder",
+                    "bevoegdheid": "Medior",
+                    "fysieke_belasting": 6,
+                    "attractie": "River Rapids",
+                    "is_buitenwerk": 1
+                }
+            ]
         },
         {
             "id": 23,
@@ -97,10 +67,6 @@
             "y_coord": -50.7092
         },
         {
-            "omschrijving": "pauze",
-            "duur": 15
-        },
-        {
             "id": 37,
             "omschrijving": "Controle van hekwerken en poorten",
             "duur": 75,
@@ -115,11 +81,24 @@
             "y_coord": -50.7288
         },
         {
+            "id": 100,
+            "omschrijving": "Schoonmaken van verfkwasten en materialen",
+            "duur": 15,
+            "prioriteit": "laag",
+            "beroepstype": "Schilder",
+            "bevoegdheid": "Stagiair",
+            "fysieke_belasting": 4,
+            "attractie": null,
+            "is_buitenwerk": 0,
+            "afgerond": 0,
+            "x_coord": 67.0108,
+            "y_coord": -50.7253
+        },
+        {
             "omschrijving": "administratietijd",
+            "aantal_taken": 6,
             "duur": 12
         }
     ],
-    "weer": "65%",
-    "temperatuur": 33,
-    "totale_duur": 372
+    "totale_duur": 312
 }

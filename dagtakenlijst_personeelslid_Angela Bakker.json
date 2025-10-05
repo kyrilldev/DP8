@@ -1,16 +1,16 @@
 {
     "personeelsgegevens": {
-        "personeelslid": {
-            "id": 4,
-            "naam": "Angela Bakker",
-            "werktijd": 360,
-            "beroepstype": "Onderhoudsmonteur",
-            "bevoegdheid": "Stagiair",
-            "specialist_in_attracties": "",
-            "pauze_opsplitsen": 1,
-            "leeftijd": 32,
-            "verlaagde_fysieke_belasting": 0
-        }
+        "naam": "Angela Bakker",
+        "werktijd": 360,
+        "beroepstype": "Onderhoudsmonteur",
+        "bevoegdheid": "Stagiair",
+        "specialist_in_attracties": "",
+        "pauze_opsplitsen": 1,
+        "max_fysieke_belasting": 40
+    },
+    "weergegevens": {
+        "tempratuur": 13,
+        "regenkans": 86
     },
     "dagtaken": [
         {
@@ -42,7 +42,7 @@
             "y_coord": -50.7005
         },
         {
-            "naam": "pauze",
+            "omschrijving": "pauze",
             "duur": 15
         },
         {
@@ -74,7 +74,7 @@
             "y_coord": -50.7259
         },
         {
-            "naam": "pauze",
+            "omschrijving": "pauze",
             "duur": 15
         },
         {
@@ -106,10 +106,10 @@
             "y_coord": -50.7421
         },
         {
-            "naam": "administratietijd",
+            "omschrijving": "administratietijd",
+            "aantal_taken": 6,
             "duur": 12
         }
     ],
-    "weer": "34%",
     "totale_duur": 372
 }

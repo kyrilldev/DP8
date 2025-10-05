@@ -1,0 +1,25 @@
+{
+    "personeelsgegevens": {
+        "personeelslid": {
+            "id": 8,
+            "naam": "John",
+            "werktijd": 100,
+            "beroepstype": "CEO",
+            "bevoegdheid": "Senior",
+            "specialist_in_attracties": "",
+            "pauze_opsplitsen": 1,
+            "leeftijd": 55,
+            "verlaagde_fysieke_belasting": 0
+        }
+    },
+    "dagtaken": [
+        {
+            "omschrijving": "administratietijd",
+            "duur": 0
+        }
+    ],
+    "weer": "41%",
+    "temperatuur": 10,
+    "totale_duur": 0,
+    "maximale_fysieke_belasting": 20
+}
