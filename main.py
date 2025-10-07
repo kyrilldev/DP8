@@ -292,9 +292,6 @@ for taak in onderhoudstaken:
 
             volgende_storing_na += STORING_INTERVAL_MIN
 
-
-
-
 def voeg_administratie_tijd_toe(taken: list) -> int:
     '''Berekent en voegt administratie toe aan de taken lijst'''
     tijd_per_taak = 2
@@ -320,7 +317,7 @@ def voeg_administratie_tijd_toe(taken: list) -> int:
         admin_tijd += tijd_per_taak
         aantal_taken += 1
 
-    # 3) Admin-taak toevoegen
+    # Admin-taak toevoegen
     taak = {
         "omschrijving": "administratietijd",
         "aantal_taken": aantal_taken,
