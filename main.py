@@ -24,13 +24,13 @@ def to_level(v) -> Bevoegdheid:
     return MAP[str(v).strip().lower()]
 
 def get_source_type():
-    '''Vraagt aan de gebruiker welke data source gebruikt moet worden'''
-    src = input("json or database?")
+    '''Vraagt aan de gebruiker welken data source gebruikt moet worden'''
+    src = input("json or database?\n")
     if src == "json":
-        print("chosen json")
+        # print("chosen json")
         return src
     elif src == "database":
-        print("chosen database")
+        # print("chosen database")
         return src
     else:
         return get_source_type()
@@ -101,7 +101,7 @@ def bereken_maximale_belasting(personeelslid) -> int:
         if leeftijd > 51:
             return 20
     else:
-        return verlaagde_fysieke_belasting
+        return verlaagde_fysieke_belasting if verlaagde_fysieke_belasting is not None else 0
 
 user_taken = []
 
