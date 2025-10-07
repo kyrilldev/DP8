@@ -1,12 +1,8 @@
-# import modulen
 from enum import IntEnum
-from pathlib import Path
 import json
-import pprint
-import random
-from database_wrapper import Database
-import requests as req
 import os
+import requests as req
+from database_wrapper import Database
 
 class Bevoegdheid(IntEnum):
     STAGIAIR = 0
@@ -22,22 +18,22 @@ MAP = {
 }
 
 def to_level(v) -> Bevoegdheid:
-    """Converts IntEnum to String from MAP"""
+    '''Zet IntEnum om naar string'''
     if isinstance(v, Bevoegdheid):
         return v
     return MAP[str(v).strip().lower()]
 
 def get_source_type():
-    source = input("json or database?")
-    if source == "json":
+    '''Vraagt aan de gebruiker welke data source gebruikt moet worden'''
+    src = input("json or database?")
+    if src == "json":
         print("chosen json")
-        return source
-    elif source == "database":
+        return src
+    elif src == "database":
         print("chosen database")
-        return source
+        return src
     else:
         return get_source_type()
-    
 source = get_source_type()
 
 db = Database(host="localhost", gebruiker="root", wachtwoord="Lily8-Pancake7", database="attractiepark")
@@ -49,8 +45,11 @@ db.connect()
 
 if source == "json":
     #get stuff from json files
-    files = ["personeelsgegevens_personeelslid_1.json", "personeelsgegevens_personeelslid_2.json", "personeelsgegevens_personeelslid_3.json", "personeelsgegevens_personeelslid_4.json"]
-    
+    files = ["personeelsgegevens_personeelslid_1.json",
+             "personeelsgegevens_personeelslid_2.json", 
+             "personeelsgegevens_personeelslid_3.json", 
+             "personeelsgegevens_personeelslid_4.json"]
+  
     for file in files:
         current_dir = os.path.dirname(os.path.abspath(__file__))
         json_path = os.path.join(current_dir, file)
@@ -61,11 +60,11 @@ if source == "json":
         else:
             personeelsleden.append(data)
 else:
-    select_query = "SELECT * FROM personeelslid"
-    personeelsleden = db.execute_query(select_query)
+    PERSONEELS_QUERY = "SELECT * FROM personeelslid"
+    personeelsleden = db.execute_query(PERSONEELS_QUERY)
 
-query = "SELECT * FROM onderhoudstaak"
-onderhoudstaken = db.execute_query(query)
+TAAK_QUERY = "SELECT * FROM onderhoudstaak"
+onderhoudstaken = db.execute_query(TAAK_QUERY)
 
 db.close()
 
@@ -117,47 +116,46 @@ def reserve_minuten_senior(werktijd_min: int) -> int:
 
 
 def regenkans_dag():
+    '''Get request voor de regenkans vandaag'''
     url = "http://api.weatherapi.com/v1/forecast.json"
     params = {"key": "e4a47bd82aca48e880b121521250310", "q": "Amsterdam", "aqi": "no"}
     try:
         r = req.get(url, params=params, timeout=10)
         r.raise_for_status()
-        data = r.json()
+        dt = r.json()
 
-        if "error" in data:
-            raise ValueError(f"WeatherAPI error: {data['error'].get('message', 'unknown error')}")
+        if "error" in dt:
+            raise ValueError(f"WeatherAPI error: {dt['error'].get('message', 'unknown error')}")
 
-        current = data.get("forecast", {})
+        current = dt.get("forecast", {})
 
         if current is None:
             raise ValueError("Temperature not found in API response.")
-        
+
         forecast_day = current.get("forecastday", [{}])[0]
         forecast = forecast_day.get("day", {})
 
         if "daily_will_it_rain" in forecast:
             return int(forecast["daily_will_it_rain"])
-        
 
-
-        # return int(round(float(temp)))
     except (req.RequestException, ValueError) as e:
         raise RuntimeError(f"Failed to fetch temperature: {e}") from e
 
 regen_kans = RAIN_CHANCE = regenkans_dag()
 
 def tempratuur_dag(unit: str = "C"):
+    '''Get request voor de tempratuur vandaag'''
     url = "http://api.weatherapi.com/v1/current.json"
     params = {"key": "e4a47bd82aca48e880b121521250310", "q": "Amsterdam", "aqi": "no"}
     try:
         r = req.get(url, params=params, timeout=10)
         r.raise_for_status()
-        data = r.json()
+        dt = r.json()
 
-        if "error" in data:
-            raise ValueError(f"WeatherAPI error: {data['error'].get('message', 'unknown error')}")
+        if "error" in dt:
+            raise ValueError(f"WeatherAPI error: {dt['error'].get('message', 'unknown error')}")
 
-        current = data.get("current", {})
+        current = dt.get("current", {})
         if unit.upper() == "F":
             temp = current.get("temp_f")
         else:
@@ -333,7 +331,7 @@ def voeg_administratie_tijd_toe(taken: list) -> int:
 
 
 def voeg_pauzes_toe(taken: list, duur: int, spiltsen: bool, taak_duur: int) -> list:
-    '''Voegt pauzes toe'''
+    '''Voegt pauzes toe aan taken lijsten'''
 
     def calc_insert_index(base_list: list, target_min: float) -> int:
         cumul = 0
@@ -393,6 +391,7 @@ def voeg_pauzes_toe(taken: list, duur: int, spiltsen: bool, taak_duur: int) -> l
         return taken
 
 def sorteer_taken_op_bevoegdheid(taken: list) -> list:
+    '''Sorteert taken op bevoegdheid'''
     def _req_level(taak: dict) -> int:
         # Storingen-blok
         if taak.get("type") == "storingen":
