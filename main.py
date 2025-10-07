@@ -27,9 +27,6 @@ def to_level(v) -> Bevoegdheid:
         return v
     return MAP[str(v).strip().lower()]
 
-RAIN_CHANCE = random.randint(0,100)
-# RAIN_CHANCE = 55
-
 def get_source_type():
     source = input("json or database?")
     if source == "json":
@@ -118,7 +115,36 @@ def reserve_minuten_senior(werktijd_min: int) -> int:
         start += 120
     return blokken * 60
 
-regen_kans = RAIN_CHANCE
+
+def regenkans_dag():
+    url = "http://api.weatherapi.com/v1/forecast.json"
+    params = {"key": "e4a47bd82aca48e880b121521250310", "q": "Amsterdam", "aqi": "no"}
+    try:
+        r = req.get(url, params=params, timeout=10)
+        r.raise_for_status()
+        data = r.json()
+
+        if "error" in data:
+            raise ValueError(f"WeatherAPI error: {data['error'].get('message', 'unknown error')}")
+
+        current = data.get("forecast", {})
+
+        if current is None:
+            raise ValueError("Temperature not found in API response.")
+        
+        forecast_day = current.get("forecastday", [{}])[0]
+        forecast = forecast_day.get("day", {})
+
+        if "daily_will_it_rain" in forecast:
+            return int(forecast["daily_will_it_rain"])
+        
+
+
+        # return int(round(float(temp)))
+    except (req.RequestException, ValueError) as e:
+        raise RuntimeError(f"Failed to fetch temperature: {e}") from e
+
+regen_kans = RAIN_CHANCE = regenkans_dag()
 
 def tempratuur_dag(unit: str = "C"):
     url = "http://api.weatherapi.com/v1/current.json"
