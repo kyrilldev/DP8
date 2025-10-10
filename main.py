@@ -417,6 +417,9 @@ dagtakenlijst = {
     "totale_duur": totale_taak_duur
 }
 
+
+
+
 # uiteindelijk schrijven we de dictionary weg naar een JSON-bestand, die kan worden ingelezen door de acceptatieomgeving
 with open(f"dagtakenlijst_personeelslid_{personeelsleden[person_idx]['naam']}.json", 'w', encoding='utf-8') as json_bestand_uitvoer:
     json.dump(dagtakenlijst, json_bestand_uitvoer, indent=4)
